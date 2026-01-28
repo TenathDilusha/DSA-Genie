@@ -1,4 +1,3 @@
-// src/ChatBox.jsx
 import { useState, useRef, useEffect } from "react";
 import { sendMessage } from "./services/api";
 
