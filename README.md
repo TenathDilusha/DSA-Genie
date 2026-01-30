@@ -28,7 +28,7 @@ The chatbot helps users with DSA concepts, explanations, and code, leveraging a 
 ```
 cd backend
 pip install -r requirements.txt
-python main.py
+uvicorn main:app --reload
 ```
 The backend will start the API server for the chatbot.
 
