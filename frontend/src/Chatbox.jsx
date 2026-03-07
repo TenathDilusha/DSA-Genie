@@ -3,15 +3,13 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { streamMessage, executeCode } from "./services/api";
-import { Send, Bot, User, Copy, Check, Play, Loader2, Sparkles } from "lucide-react";
+import { streamMessage } from "./services/api";
+import { Send, Bot, User, Copy, Check, Loader2, Sparkles, ArrowRightToLine } from "lucide-react";
 
 const RUNNABLE = new Set(["python", "python3", "javascript", "js"]);
 
 /* ── Inline code block with run button ── */
-function CodeBlock({ inline, className, children, ...props }) {
-  const [output, setOutput] = useState(null);
-  const [running, setRunning] = useState(false);
+function CodeBlock({ inline, className, children, onSendToRunner, ...props }) {
   const [copied, setCopied] = useState(false);
   const match = /language-(\w+)/.exec(className || "");
   const lang = match ? match[1] : null;
@@ -27,19 +25,6 @@ function CodeBlock({ inline, className, children, ...props }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleRun = async () => {
-    setRunning(true);
-    setOutput(null);
-    try {
-      const res = await executeCode(lang, code);
-      setOutput(res);
-    } catch {
-      setOutput({ success: false, output: "Failed to reach execution server.", exit_code: -1 });
-    } finally {
-      setRunning(false);
-    }
-  };
-
   return (
     <div className="code-block-wrapper">
       <div className="code-block-header">
@@ -50,12 +35,11 @@ function CodeBlock({ inline, className, children, ...props }) {
           </button>
           {RUNNABLE.has(lang) && (
             <button
-              className={`code-action-btn run ${running ? "running" : ""}`}
-              onClick={handleRun}
-              disabled={running}
-              title="Run code"
+              className="code-action-btn send-to-runner"
+              onClick={() => onSendToRunner?.(code, lang)}
+              title="Open in Code Runner"
             >
-              {running ? <Loader2 size={14} className="spin" /> : <Play size={14} />}
+              <ArrowRightToLine size={14} />
             </button>
           )}
         </div>
@@ -69,20 +53,12 @@ function CodeBlock({ inline, className, children, ...props }) {
       >
         {code}
       </SyntaxHighlighter>
-      {output && (
-        <div className={`code-run-output ${output.success ? "success" : "error"}`}>
-          <div className="output-status">
-            {output.success ? "✓ Output" : `✗ Error (exit ${output.exit_code})`}
-          </div>
-          <pre>{output.output}</pre>
-        </div>
-      )}
     </div>
   );
 }
 
 /* ── Main Chat Component ── */
-export default function ChatBox() {
+export default function ChatBox({ onSendToRunner }) {
   const [messages, setMessages] = useState([
     { sender: "bot", text: "Hi! I'm **DSA Genie** — your Data Structures & Algorithms assistant.\n\nAsk me anything about DSA concepts, algorithms, or coding problems!" },
   ]);
@@ -170,7 +146,9 @@ export default function ChatBox() {
                 {isBot ? (
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
-                    components={{ code: CodeBlock }}
+                    components={{
+                      code: (props) => <CodeBlock {...props} onSendToRunner={onSendToRunner} />,
+                    }}
                   >
                     {msg.text}
                   </ReactMarkdown>

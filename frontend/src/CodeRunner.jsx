@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Play, RotateCcw, ChevronDown, Terminal, Loader2 } from "lucide-react";
 import { executeCode } from "./services/api";
 
@@ -7,16 +7,37 @@ const LANGUAGES = [
   { value: "javascript", label: "JavaScript" },
 ];
 
+const LANG_MAP = {
+  python: "python",
+  python3: "python",
+  py: "python",
+  javascript: "javascript",
+  js: "javascript",
+};
+
 const TEMPLATES = {
   python: `# Write your code here\nprint("Hello, DSA Genie!")`,
   javascript: `// Write your code here\nconsole.log("Hello, DSA Genie!");`,
 };
 
-export default function CodeRunner() {
+export default function CodeRunner({ injectedCode }) {
   const [language, setLanguage] = useState("python");
   const [code, setCode] = useState(TEMPLATES.python);
   const [output, setOutput] = useState(null);
   const [running, setRunning] = useState(false);
+  const [flash, setFlash] = useState(false);
+
+  // Accept code from chat code blocks
+  useEffect(() => {
+    if (!injectedCode) return;
+    const mappedLang = LANG_MAP[injectedCode.lang?.toLowerCase()] || "python";
+    setLanguage(mappedLang);
+    setCode(injectedCode.code);
+    setOutput(null);
+    setFlash(true);
+    const t = setTimeout(() => setFlash(false), 800);
+    return () => clearTimeout(t);
+  }, [injectedCode]);
 
   const handleLangChange = (e) => {
     const lang = e.target.value;
@@ -44,7 +65,7 @@ export default function CodeRunner() {
   };
 
   return (
-    <div className="code-runner-panel">
+    <div className={`code-runner-panel ${flash ? "flash" : ""}`}>
       <div className="runner-header">
         <div className="runner-title">
           <Terminal size={18} />

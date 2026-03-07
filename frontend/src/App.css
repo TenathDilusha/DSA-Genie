@@ -365,6 +365,15 @@ body {
   cursor: not-allowed;
 }
 
+.code-action-btn.send-to-runner {
+  color: var(--accent);
+}
+
+.code-action-btn.send-to-runner:hover {
+  background: var(--accent-muted);
+  color: var(--accent-hover);
+}
+
 /* Code output */
 .code-run-output {
   padding: 10px 14px;
@@ -512,6 +521,17 @@ body {
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
+  transition: box-shadow 0.3s;
+}
+
+.code-runner-panel.flash {
+  animation: runnerFlash 0.8s ease;
+}
+
+@keyframes runnerFlash {
+  0% { box-shadow: inset 0 0 0 2px var(--accent); }
+  50% { box-shadow: inset 0 0 20px 2px var(--accent-muted); }
+  100% { box-shadow: none; }
 }
 
 .runner-header {
