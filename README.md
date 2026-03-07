@@ -45,8 +45,5 @@ The frontend will be available at the local address shown in the terminal.
 - `backend/` — Python FastAPI backend, LLM, RAG logic
 - `frontend/` — React app, chat UI
 
-## Customization
-You can expand the knowledge base, tune the LLM, or adjust the UI as needed for your use case.
-
 ## License
 MIT

@@ -30,7 +30,7 @@ __pycache__/
 .env
 .venv/
 backend/.env
-backend/.venv/
+backend/venv/
 backend/__pycache__/
 backend/*.pyc
 backend/*.pyo
@@ -40,7 +40,7 @@ backend/.mypy_cache/
 backend/.coverage
 backend/.cache/
 backend/.DS_Store
-backend/data/
+backend/data/faiss_index
 
 # Frontend build
 frontend/node_modules/
