@@ -1,9 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 import uvicorn
+import json
 
-from qa_bot import ask_question
+from qa_bot import ask_question, stream_question
 from code_runner import run_code
 
 
@@ -31,6 +33,17 @@ class CodeRequest(BaseModel):
 def chat(req: Question):
     answer = ask_question(req.message)
     return {"answer": answer}
+
+
+@app.post("/chat/stream")
+def chat_stream(req: Question):
+    def token_generator():
+        for token in stream_question(req.message):
+            # JSON-encode so newlines/special chars survive SSE transport
+            yield f"data: {json.dumps(token)}\n\n"
+        yield "data: [DONE]\n\n"
+
+    return StreamingResponse(token_generator(), media_type="text/event-stream")
 
 
 @app.post("/execute")
