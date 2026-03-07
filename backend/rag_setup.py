@@ -1,9 +1,12 @@
 from langchain_community.vectorstores import FAISS
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
+from dotenv import load_dotenv
 import fitz
 import warnings
 import os
+
+load_dotenv()
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 os.environ["HF_HUB_VERBOSITY"] = "error"
@@ -20,7 +23,8 @@ def load_pdf(file_path):
 
 def setup_rag():
     embeddings = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2"
+        model_name="sentence-transformers/all-MiniLM-L6-v2",
+        model_kwargs={"token": os.getenv("HF_TOKEN")},
     )
 
     if os.path.exists(FAISS_INDEX_PATH):

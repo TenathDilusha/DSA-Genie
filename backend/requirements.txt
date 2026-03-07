@@ -7,5 +7,7 @@ sentence-transformers
 langchain-huggingface
 faiss-cpu
 pydantic
+python-dotenv
 langchain-ollama
 PyMuPDF
+mcp

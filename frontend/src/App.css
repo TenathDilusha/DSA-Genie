@@ -151,3 +151,94 @@ button {
 button:hover {
   background: #0056cc;
 }
+
+/* ── Code Runner ── */
+.code-runner {
+  margin: 10px 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #2d2d2d;
+}
+
+.code-runner-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #1e1e1e;
+  padding: 6px 12px;
+}
+
+.lang-badge {
+  font-size: 11px;
+  font-family: monospace;
+  color: #a0aec0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.run-btn {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #22c55e;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.run-btn:hover:not(:disabled) {
+  background: #16a34a;
+}
+
+.run-btn.running,
+.run-btn:disabled {
+  background: #6b7280;
+  cursor: not-allowed;
+}
+
+/* Terminal-style output panel */
+.code-output {
+  background: #0d1117;
+  padding: 12px 16px;
+  font-family: "Fira Code", "Cascadia Code", "Courier New", monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  border-top: 1px solid #2d2d2d;
+}
+
+.code-output pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.output-label {
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  letter-spacing: 0.04em;
+}
+
+.code-output.success {
+  color: #a3e635;
+}
+
+.code-output.success .output-label {
+  color: #86efac;
+}
+
+.code-output.error {
+  color: #f87171;
+}
+
+.code-output.error .output-label {
+  color: #fca5a5;
+}
+
+/* Remove default margins inside code blocks from react-syntax-highlighter */
+.code-runner div[class^="language-"] {
+  margin: 0 !important;
+  border-radius: 0 !important;
+}

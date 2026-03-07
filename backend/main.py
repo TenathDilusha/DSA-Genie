@@ -4,6 +4,7 @@ from pydantic import BaseModel
 import uvicorn
 
 from qa_bot import ask_question
+from code_runner import run_code
 
 
 app = FastAPI()
@@ -21,10 +22,21 @@ class Question(BaseModel):
     message: str
 
 
+class CodeRequest(BaseModel):
+    language: str
+    code: str
+
+
 @app.post("/chat")
 def chat(req: Question):
     answer = ask_question(req.message)
     return {"answer": answer}
+
+
+@app.post("/execute")
+def execute(req: CodeRequest):
+    result = run_code(req.language, req.code)
+    return result
 
 
 if __name__ == "__main__":

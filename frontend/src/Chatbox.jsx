@@ -2,20 +2,62 @@ import { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { sendMessage } from "./services/api";
+import { sendMessage, executeCode } from "./services/api";
 
-const CodeBlock = ({ node, inline, className, children, ...props }) => {
+const RUNNABLE = new Set(["python", "python3", "javascript", "js"]);
+
+function CodeBlock({ node, inline, className, children, ...props }) {
+  const [output, setOutput] = useState(null);
+  const [running, setRunning] = useState(false);
   const match = /language-(\w+)/.exec(className || "");
-  return !inline && match ? (
-    <SyntaxHighlighter style={oneDark} language={match[1]} PreTag="div" {...props}>
-      {String(children).replace(/\n$/, "")}
-    </SyntaxHighlighter>
-  ) : (
-    <code className="inline-code" {...props}>
-      {children}
-    </code>
+  const lang = match ? match[1] : null;
+  const code = String(children).replace(/\n$/, "");
+
+  const handleRun = async () => {
+    setRunning(true);
+    setOutput(null);
+    try {
+      const res = await executeCode(lang, code);
+      setOutput(res);
+    } catch {
+      setOutput({ success: false, output: "Failed to reach execution server.", exit_code: -1 });
+    } finally {
+      setRunning(false);
+    }
+  };
+
+  if (inline || !lang) {
+    return <code className="inline-code" {...props}>{children}</code>;
+  }
+
+  return (
+    <div className="code-runner">
+      <div className="code-runner-header">
+        <span className="lang-badge">{lang}</span>
+        {RUNNABLE.has(lang) && (
+          <button
+            className={`run-btn ${running ? "running" : ""}`}
+            onClick={handleRun}
+            disabled={running}
+          >
+            {running ? "Running…" : "▶ Run"}
+          </button>
+        )}
+      </div>
+      <SyntaxHighlighter style={oneDark} language={lang} PreTag="div" {...props}>
+        {code}
+      </SyntaxHighlighter>
+      {output && (
+        <div className={`code-output ${output.success ? "success" : "error"}`}>
+          <div className="output-label">
+            {output.success ? "✅ Output" : `❌ Error (exit ${output.exit_code})`}
+          </div>
+          <pre>{output.output}</pre>
+        </div>
+      )}
+    </div>
   );
-};
+}
 
 function ChatBox() {
   const [messages, setMessages] = useState([
