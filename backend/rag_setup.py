@@ -27,7 +27,8 @@ def setup_rag():
         model_kwargs={"token": os.getenv("HF_TOKEN")},
     )
 
-    if os.path.exists(FAISS_INDEX_PATH):
+    faiss_index_file = os.path.join(FAISS_INDEX_PATH, "index.faiss")
+    if os.path.exists(faiss_index_file):
         vectorstore = FAISS.load_local(
             FAISS_INDEX_PATH,
             embeddings,
@@ -35,15 +36,13 @@ def setup_rag():
         )
         return vectorstore
 
+    # If index file does not exist, build and save the index
     text = load_pdf("data/DSA.pdf")
-
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=500,
         chunk_overlap=100
     )
     docs = splitter.create_documents([text])
-
     vectorstore = FAISS.from_documents(docs, embeddings)
     vectorstore.save_local(FAISS_INDEX_PATH)
-
     return vectorstore
